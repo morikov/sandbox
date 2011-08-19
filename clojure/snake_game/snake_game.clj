@@ -24,3 +24,30 @@
 (defn point-to-screen-rect [pt]
   (map #(* point-size %) [(pt 0) (pt 1) 1 1])) ; (pt 0) vectorの添字演算
 
+(defn create-apple []
+  {:location [(rand-int width) (rand-int height)]
+   :color (Color. 210 50 90)
+   :type :apple})
+
+(defn create-snake []
+  {:body (list [1 1])
+   :dir [1 0]
+   :type :snake
+   :color (Color. 15 160 70)})
+
+(defn move [{:keys [body dir] :as snake} & grow]
+  (assoc snake :body (cons (add-points (first body) dir)
+                           (if grow body (butlast body)))))
+
+(defn win? [{:keys [body]}]
+  (>= (count body) win-length))
+
+(defn head-overlaps-body? [{[head & body] :body}] ; 配列形式の分配束縛を合わせて使うことで、先頭要素とソレ以外に束縛させる
+  (includes? body head))
+
+(defn eats? [{[snake-head] :body} {apple :location}]
+  (= snake-head apple))
+
+(defn turn [snake newdir]
+  (assoc snake :dir newdir))
+
